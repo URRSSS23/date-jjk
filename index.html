@@ -3,134 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data și Ora României</title>
+    <title>Ora Exactă România</title>
     <style>
-        /* Stiluri existente... păstrate la fel */
-        /* Adaugă aceste noi reguli CSS pentru a bloca selecția text */
         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+        }
+        .container {
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .date { font-size: 1.8rem; margin: 15px 0; }
+        .time { font-size: 3.5rem; font-family: 'Courier New', monospace; }
+        .time span { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
     </style>
-    <script>
-        // Blocare inspect element și dezactivare click dreapta
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Blocare scurtături de tastatură (F12, Ctrl+Shift+I, etc.)
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && e.key === 'I') || 
-                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-                (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-            }
-        });
-
-        // Funcția principală de actualizare (cu protecție anti-manipulare)
-        function secureUpdateDateTime() {
-            const now = new Date();
-            const clientTime = now.getTime();
-            const serverTimeEstimate = Date.now(); // Într-o aplicație reală, aici ai face un request la server
-            
-            // Verificăm diferența mare de timp (anti-manipulare)
-            if (Math.abs(clientTime - serverTimeEstimate) > 60000) { // Dacă diferența > 1 minut
-                document.body.innerHTML = '<h1 style="color:red">EROARE: Timpul sistemului a fost modificat!</h1>';
-                return;
-            }
-
-            // Actualizare zi și dată (cu verificare)
-            try {
-                const options = { 
-                    timeZone: 'Europe/Bucharest',
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                
-                const weekday = now.toLocaleDateString('ro-RO', { 
-                    timeZone: 'Europe/Bucharest',
-                    weekday: 'long' 
-                });
-                
-                const fullDate = now.toLocaleDateString('ro-RO', { 
-                    timeZone: 'Europe/Bucharest',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                
-                document.getElementById('weekday').textContent = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-                document.getElementById('full-date').textContent = fullDate;
-                
-                // Actualizare oră cu verificare
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                
-                if (hours > 23 || minutes > 59 || seconds > 59) {
-                    throw new Error("Timp invalid");
-                }
-                
-                document.getElementById('hours').textContent = hours;
-                document.getElementById('minutes').textContent = minutes;
-                document.getElementById('seconds').textContent = seconds;
-            } catch (e) {
-                console.error("Eroare la actualizarea timpului:", e);
-            }
-        }
-
-        // Pornire securizată
-        window.onload = function() {
-            setInterval(secureUpdateDateTime, 1000);
-            secureUpdateDateTime();
-            
-            // Verificare periodică a integrității
-            setInterval(function() {
-                if (document.body.innerHTML !== document.body.originalHTML) {
-                    document.body.innerHTML = document.body.originalHTML;
-                    secureUpdateDateTime();
-                }
-            }, 5000);
-            
-            // Salvăm HTML original pentru comparație
-            document.body.originalHTML = document.body.innerHTML;
-        };
-    </script>
 </head>
 <body>
-    <!-- Conținutul tău existent aici -->
     <div class="container">
-        <h1><i class="fas fa-clock"></i> Data și Ora României</h1>
-        
-        <div class="card animate-fade">
-            <div class="date-display">
-                <div class="weekday" id="weekday">Se încarcă...</div>
-                <div class="full-date" id="full-date">-</div>
-                
-                <div class="time-container">
-                    <div class="time-unit">
-                        <div class="time-value" id="hours">00</div>
-                        <div class="time-label">Ore</div>
-                    </div>
-                    <div class="time-unit">
-                        <div class="time-value" id="minutes">00</div>
-                        <div class="time-label">Minute</div>
-                    </div>
-                    <div class="time-unit">
-                        <div class="time-value" id="seconds">00</div>
-                        <div class="time-label">Secunde</div>
-                    </div>
-                </div>
-            </div>
+        <h1>Ora Exactă România</h1>
+        <div class="date" id="currentDate">Se încarcă...</div>
+        <div class="time" id="currentTime">
+            <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
         </div>
     </div>
 
-    <!-- Încărcare Font Awesome din CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Blocare acces cod
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key))) e.preventDefault();
+        });
+
+        // Actualizare automata
+        function updateTime() {
+            const now = new Date();
+            const roTime = now.toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+            
+            // Extrage ziua, data și ora
+            const [weekday, date] = roTime.split(', ');
+            document.getElementById('currentDate').textContent = 
+                `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}, ${date}`;
+            
+            // Actualizează ora
+            const [time] = roTime.split(' ').reverse();
+            const [h, m, s] = time.split(':');
+            document.getElementById('hours').textContent = h;
+            document.getElementById('minutes').textContent = m;
+            document.getElementById('seconds').textContent = s.split(' ')[0];
+        }
+
+        // Rulează la încărcare și la fiecare secundă
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
 </body>
 </html>

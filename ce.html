@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ziua curentă și fusuri orare</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --text-primary: #ffffff;
+      --text-secondary: #aaaaaa;
+      --card-bg: #1e1e1e;
+      --accent: #4fc3f7;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 2rem 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      margin: 1rem 0;
+      width: 320px;
+    }
+    .day {
+      font-size: 2.3rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .date, .time {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.3rem;
+    }
+    .timezones {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 1080px;
+      margin-top: 1rem;
+    }
+    .timezone-card {
+      background: #222;
+      padding: 1rem 1.5rem;
+      border-radius: 0.8rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      width: 280px;
+      text-align: center;
+    }
+    .timezone-title {
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin-bottom: 0.4rem;
+      color: var(--accent);
+    }
+    iframe {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      margin-top: 2rem;
+      max-width: 360px;
+      width: 100%;
+      height: 215px;
+    }
+  </style>
+  <script>
+    // Dezactivează click dreapta și shortcut-uri pentru Inspect element
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        return false;
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="card" id="local-time">
+    <div class="day" id="ziua">Se încarcă...</div>
+    <div class="date" id="data"></div>
+    <div class="time" id="timp"></div>
+  </div>
+
+  <div class="timezones" id="fusuri"></div>
+
+  <iframe
+    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+    allowfullscreen
+    title="YouTube Player"
+  ></iframe>
+
+  <script>
+    // Fusuri orare cu cod limbă pentru afișarea datei în limba locală
+    const fusuri = [
+      { oras: 'New York', zona: 'America/New_York', lang: 'en-US' },
+      { oras: 'Londra', zona: 'Europe/London', lang: 'en-GB' },
+      { oras: 'Tokyo', zona: 'Asia/Tokyo', lang: 'ja-JP' },
+      { oras: 'Sydney', zona: 'Australia/Sydney', lang: 'en-AU' },
+      { oras: 'Dubai', zona: 'Asia/Dubai', lang: 'ar-AE' }
+    ];
+
+    const ziuaEl = document.getElementById('ziua');
+    const dataEl = document.getElementById('data');
+    const timpEl = document.getElementById('timp');
+    const fusuriContainer = document.getElementById('fusuri');
+
+    function actualizeazaTimpul() {
+      const acum = new Date();
+
+      // România - limba română
+      const ziua = new Intl.DateTimeFormat('ro-RO', { weekday: 'long', timeZone: 'Europe/Bucharest' }).format(acum);
+      const data = new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Bucharest' }).format(acum);
+      const ora = new Intl.DateTimeFormat('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Bucharest', hour12: false }).format(acum);
+
+      ziuaEl.innerText = `Astăzi este ${ziua.charAt(0).toUpperCase() + ziua.slice(1)}`;
+      dataEl.innerText = data;
+      timpEl.innerText = ora;
+
+      // Actualizăm fusurile orare
+      fusuriContainer.innerHTML = ''; // golim containerul
+
+      fusuri.forEach(loc => {
+        const dataLoc = new Intl.DateTimeFormat(loc.lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: loc.zona }).format(acum);
+        const oraLoc = new Intl.DateTimeFormat(loc.lang, { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: loc.zona, hour12: false }).format(acum);
+
+        const div = document.createElement('div');
+        div.className = 'timezone-card';
+
+        div.innerHTML = `
+          <div class="timezone-title">${loc.oras}</div>
+          <div class="date">${dataLoc}</div>
+          <div class="time">${oraLoc}</div>
+        `;
+
+        fusuriContainer.appendChild(div);
+      });
+    }
+
+    actualizeazaTimpul();
+    setInterval(actualizeazaTimpul, 1000);
+  </script>
+</body>
+</html>

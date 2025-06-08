@@ -3,6 +3,9 @@ body {
     font-family: 'Roboto', Arial, sans-serif;
     background: #172a45;
     color: #fff;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .video-container {

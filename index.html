@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chrome</title>
+<title>Data, ora, prognoza și player YouTube animat</title>
 <style>
   :root {
     --bg: #121212;
@@ -19,6 +19,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex; flex-direction: column; align-items: center;
     gap: 1.5rem;
+    min-height: 100vh;
   }
   .card {
     background: var(--card-bg);
@@ -80,25 +81,37 @@
       transform: translateY(0);
     }
   }
+  #time-cards {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 1rem; 
+    justify-content: center; 
+    max-width: 1100px;
+  }
 </style>
 </head>
 <body>
 
-  <div id="time-cards" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; max-width: 1100px;">
+  <!-- Card fusuri orare -->
+  <div id="time-cards">
+    <!-- Cardurile se generează din JS -->
   </div>
 
+  <!-- Card player YouTube -->
   <div class="card" style="animation-delay: 0.5s;">
     <div class="day">Player YouTube</div>
     <input id="player-input" type="text" placeholder="Introdu link YouTube aici" />
     <iframe id="yt-player" src="" allowfullscreen></iframe>
   </div>
 
+  <!-- Card prognoza meteo -->
   <div class="card" id="weather" style="animation-delay: 1s;">
     <div class="day">Prognoză meteo București</div>
     <div id="weather-info">Se încarcă...</div>
   </div>
 
 <script>
+  // Fusuri orare și date în limba locală
   const zones = [
     { city: "București", tz: "Europe/Bucharest", lang: "ro-RO" },
     { city: "New York", tz: "America/New_York", lang: "en-US" },
@@ -109,28 +122,37 @@
 
   const timeCardsContainer = document.getElementById("time-cards");
 
+  // Cream cardurile o singura data
+  zones.forEach(({city}, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.animationDelay = `${i * 0.2}s`;
+    card.innerHTML = `
+      <div class="day">${city}: <span class="day-name"></span></div>
+      <div class="date"><span class="date-val"></span></div>
+      <div class="time"><span class="time-val"></span></div>
+    `;
+    timeCardsContainer.appendChild(card);
+  });
+
   function updateTimeCards() {
-    timeCardsContainer.innerHTML = "";
-    zones.forEach(({city, tz, lang}, i) => {
+    const cards = timeCardsContainer.querySelectorAll(".card");
+    zones.forEach(({tz, lang}, i) => {
       const now = new Date();
       const day = new Intl.DateTimeFormat(lang, { weekday: 'long', timeZone: tz }).format(now);
       const date = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: tz }).format(now);
       const time = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: tz }).format(now);
 
-      const card = document.createElement("div");
-      card.className = "card";
-      card.style.animationDelay = `${i * 0.2}s`;
-      card.innerHTML = `
-        <div class="day">${city}: ${day.charAt(0).toUpperCase() + day.slice(1)}</div>
-        <div class="date">${date}</div>
-        <div class="time">${time}</div>
-      `;
-      timeCardsContainer.appendChild(card);
+      const card = cards[i];
+      card.querySelector(".day-name").textContent = day.charAt(0).toUpperCase() + day.slice(1);
+      card.querySelector(".date-val").textContent = date;
+      card.querySelector(".time-val").textContent = time;
     });
   }
   setInterval(updateTimeCards, 1000);
   updateTimeCards();
 
+  // Player YouTube embed
   const input = document.getElementById("player-input");
   const iframe = document.getElementById("yt-player");
 
@@ -148,7 +170,8 @@
     }
   });
 
-  const apiKey = 'CHEIA_TA_API_AICI'; 
+  // Prognoza meteo București - OpenWeatherMap
+  const apiKey = 'CHEIA_TA_API_AICI'; // pune cheia ta API aici
   const city = 'Bucharest';
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=ro&appid=${apiKey}`;
 

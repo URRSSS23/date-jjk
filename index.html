@@ -2,12 +2,12 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8" />
-  <title>Ziua curentă și fusuri orare</title>
+  <title>Data, ora și prognoza meteo</title>
   <style>
     :root {
       --bg: #121212;
-      --text-primary: #ffffff;
-      --text-secondary: #aaaaaa;
+      --text-primary: #fff;
+      --text-secondary: #aaa;
       --card-bg: #1e1e1e;
       --accent: #4fc3f7;
     }
@@ -15,21 +15,19 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg);
       color: var(--text-primary);
+      margin: 0; padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 1rem;
     }
     .card {
       background: var(--card-bg);
-      padding: 2rem 2.5rem;
       border-radius: 1rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      text-align: center;
+      padding: 2rem;
       margin: 1rem 0;
       width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
     }
     .day {
       font-size: 2.3rem;
@@ -37,121 +35,72 @@
       color: var(--accent);
       margin-bottom: 0.5rem;
     }
-    .date, .time {
+    .date, .time, .weather-info {
       font-size: 1.2rem;
       color: var(--text-secondary);
       margin-bottom: 0.3rem;
     }
-    .timezones {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      max-width: 1080px;
+    #weather {
       margin-top: 1rem;
     }
-    .timezone-card {
-      background: #222;
-      padding: 1rem 1.5rem;
-      border-radius: 0.8rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      width: 280px;
-      text-align: center;
-    }
-    .timezone-title {
-      font-weight: 600;
-      font-size: 1.3rem;
-      margin-bottom: 0.4rem;
-      color: var(--accent);
-    }
-    iframe {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-      margin-top: 2rem;
-      max-width: 360px;
-      width: 100%;
-      height: 215px;
-    }
   </style>
-  <script>
-    // Dezactivează click dreapta și shortcut-uri pentru Inspect element
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.onkeydown = function(e) {
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-        (e.ctrlKey && e.key === 'U')
-      ) {
-        return false;
-      }
-    };
-  </script>
 </head>
 <body>
+
   <div class="card" id="local-time">
     <div class="day" id="ziua">Se încarcă...</div>
     <div class="date" id="data"></div>
     <div class="time" id="timp"></div>
   </div>
 
-  <div class="timezones" id="fusuri"></div>
-
-  <iframe
-    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-    allowfullscreen
-    title="YouTube Player"
-  ></iframe>
+  <div class="card" id="weather">
+    <div class="day">Prognoză meteo București</div>
+    <div id="weather-info">Se încarcă...</div>
+  </div>
 
   <script>
-    // Fusuri orare cu cod limbă pentru afișarea datei în limba locală
-    const fusuri = [
-      { oras: 'New York', zona: 'America/New_York', lang: 'en-US' },
-      { oras: 'Londra', zona: 'Europe/London', lang: 'en-GB' },
-      { oras: 'Tokyo', zona: 'Asia/Tokyo', lang: 'ja-JP' },
-      { oras: 'Sydney', zona: 'Australia/Sydney', lang: 'en-AU' },
-      { oras: 'Dubai', zona: 'Asia/Dubai', lang: 'ar-AE' }
-    ];
-
-    const ziuaEl = document.getElementById('ziua');
-    const dataEl = document.getElementById('data');
-    const timpEl = document.getElementById('timp');
-    const fusuriContainer = document.getElementById('fusuri');
-
     function actualizeazaTimpul() {
       const acum = new Date();
-
-      // România - limba română
       const ziua = new Intl.DateTimeFormat('ro-RO', { weekday: 'long', timeZone: 'Europe/Bucharest' }).format(acum);
       const data = new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Bucharest' }).format(acum);
       const ora = new Intl.DateTimeFormat('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Bucharest', hour12: false }).format(acum);
 
-      ziuaEl.innerText = `Astăzi este ${ziua.charAt(0).toUpperCase() + ziua.slice(1)}`;
-      dataEl.innerText = data;
-      timpEl.innerText = ora;
+      document.getElementById('ziua').innerText = `Astăzi este ${ziua.charAt(0).toUpperCase() + ziua.slice(1)}`;
+      document.getElementById('data').innerText = data;
+      document.getElementById('timp').innerText = ora;
+    }
+    setInterval(actualizeazaTimpul, 1000);
+    actualizeazaTimpul();
 
-      // Actualizăm fusurile orare
-      fusuriContainer.innerHTML = ''; // golim containerul
+    const apiKey = 'CHEIA_TA_API_AICI'; 
+    const city = 'Bucharest';
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=ro&appid=${apiKey}`;
 
-      fusuri.forEach(loc => {
-        const dataLoc = new Intl.DateTimeFormat(loc.lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: loc.zona }).format(acum);
-        const oraLoc = new Intl.DateTimeFormat(loc.lang, { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: loc.zona, hour12: false }).format(acum);
+    function afiseazaMeteo(data) {
+      if(data.cod !== 200) {
+        document.getElementById('weather-info').innerText = 'Nu s-a putut obține prognoza meteo.';
+        return;
+      }
+      const temp = data.main.temp.toFixed(1);
+      const descriere = data.weather[0].description;
+      const umiditate = data.main.humidity;
+      const vant = data.wind.speed;
 
-        const div = document.createElement('div');
-        div.className = 'timezone-card';
-
-        div.innerHTML = `
-          <div class="timezone-title">${loc.oras}</div>
-          <div class="date">${dataLoc}</div>
-          <div class="time">${oraLoc}</div>
-        `;
-
-        fusuriContainer.appendChild(div);
-      });
+      document.getElementById('weather-info').innerHTML = `
+        <p>Temperatura: ${temp} °C</p>
+        <p>Stare: ${descriere.charAt(0).toUpperCase() + descriere.slice(1)}</p>
+        <p>Umiditate: ${umiditate}%</p>
+        <p>Vânt: ${vant} m/s</p>
+      `;
     }
 
-    actualizeazaTimpul();
-    setInterval(actualizeazaTimpul, 1000);
+    fetch(url)
+      .then(res => res.json())
+      .then(afiseazaMeteo)
+      .catch(() => {
+        document.getElementById('weather-info').innerText = 'Eroare la preluarea datelor meteo.';
+      });
   </script>
+
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ora Exactă România</title>
     <style>
+        
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -18,6 +19,7 @@
             justify-content: center;
             user-select: none;
         }
+        
         .container {
             background: rgba(0,0,0,0.7);
             border-radius: 15px;
@@ -35,7 +37,28 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
     </style>
+    <button id="muteButton" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 1000;
+">
+    🔇 Sunet OFF
+</button>
+
+<video autoplay muted loop playsinline id="bg-video" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1; object-fit: cover;">
+    <source src="media/tg.mp4" type="video/mp4">
+    Browserul tău nu suportă video HTML5.
+</video
+
 </head>
 <body>
     <div class="container">
@@ -47,6 +70,7 @@
     </div>
 
     <script>
+
         // Blocare acces cod
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
@@ -75,5 +99,22 @@
         updateTime();
         setInterval(updateTime, 1000);
     </script>
+    <script>
+    const video = document.getElementById('bg-video');
+    const muteButton = document.getElementById('muteButton');
+
+    muteButton.addEventListener('click', () => {
+        video.muted = !video.muted;
+        muteButton.textContent = video.muted ? '🔇 Sunet OFF' : '🔊 Sunet ON';
+    });
+
+    // Încearcă să redea video după ce pagina s-a încărcat
+    window.addEventListener('load', () => {
+        video.play().catch(error => {
+            console.log('Autoplay e blocat:', error);
+        });
+    });
+    </script>
+
 </body>
 </html>

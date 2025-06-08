@@ -92,26 +92,21 @@
 </head>
 <body>
 
-  <!-- Card fusuri orare -->
   <div id="time-cards">
-    <!-- Cardurile se generează din JS -->
   </div>
 
-  <!-- Card player YouTube -->
   <div class="card" style="animation-delay: 0.5s;">
     <div class="day">Player YouTube</div>
-    <input id="player-input" type="text" placeholder="Introdu link YouTube aici" />
+    <input id="player-input" type="text" placeholder="Link video" />
     <iframe id="yt-player" src="" allowfullscreen></iframe>
   </div>
 
-  <!-- Card prognoza meteo -->
   <div class="card" id="weather" style="animation-delay: 1s;">
-    <div class="day">Prognoză meteo București</div>
+    <div class="day">Sistem incomplet/Incomplete system</div>
     <div id="weather-info">Se încarcă...</div>
   </div>
 
 <script>
-  // Fusuri orare și date în limba locală
   const zones = [
     { city: "București", tz: "Europe/Bucharest", lang: "ro-RO" },
     { city: "New York", tz: "America/New_York", lang: "en-US" },
@@ -122,7 +117,6 @@
 
   const timeCardsContainer = document.getElementById("time-cards");
 
-  // Cream cardurile o singura data
   zones.forEach(({city}, i) => {
     const card = document.createElement("div");
     card.className = "card";
@@ -170,8 +164,7 @@
     }
   });
 
-  // Prognoza meteo București - OpenWeatherMap
-  const apiKey = '4ffd94302424b2f19522ebdc8e01baf6'; // pune cheia ta API aici
+  const apiKey = '';
   const city = 'Bucharest';
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=ro&appid=${apiKey}`;
 

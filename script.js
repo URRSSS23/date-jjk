@@ -93,3 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Bucharest' }));
     updateDayIndicator(roTime.getDay());
 });
+// inspect
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});

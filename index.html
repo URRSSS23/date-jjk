@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ro-RO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ora Exactă România</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #172a45;
+            color: #fff;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .video-container {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+            background: #172a45; /* Fallback background */
+        }
+        
+        #bg-video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(23, 42, 69, 0.7);
+            z-index: -1;
+        }
+        
+        .container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 95%;
+            margin: 0 auto;
+            background: rgba(23, 42, 69, 0.7);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            text-align: center;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            will-change: transform;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: #ffd700;
+        }
+        
+        .date-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+        
+        .date-box {
+            flex: 1;
+            min-width: 100px;
+            margin: 0;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 0;
+        }
+        
+        .date-label {
+            font-size: 0.85rem;
+            color: #b0c4de;
+        }
+        
+        .date-value {
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        
+        .day-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+        
+        .day-dot {
+            width: 14px; 
+            height: 14px;
+            border-radius: 50%;
+            background: #b0c4de;
+            opacity: 0.5;
+            transition: all 0.3s;
+            -webkit-transition: all 0.3s;
+            -moz-transition: all 0.3s;
+        }
+        
+        .day-dot.active {
+            background: #ffd700;
+            opacity: 1;
+            box-shadow: 0 0 8px #ffd700;
+        }
+        
+        .time {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 1.7rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            will-change: contents;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .seconds {
+            color: #ffd700;
+        }
+        
+        .verse-container {
+            margin: 20px 0;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .verse-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #ffd700;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        #verseText {
+            font-size: 1rem;
+            line-height: 1.5;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        #verseRef {
+            font-size: 0.9rem;
+            color: #ffd700;
+            text-align: right;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        .footer {
+            font-size: 0.85rem;
+            color: #b0c4de;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        
+        #muteButton {
+            position: fixed;
+            top: 18px; 
+            right: 18px;
+            z-index: 20;
+            background: rgba(23, 42, 69, 0.85);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        #muteButton:hover {
+            background: #ffd700;
+            color: #172a45;
+        }
+        
+        @supports not (backdrop-filter: blur(10px)) {
+            .container {
+                background: rgba(23, 42, 69, 0.95);
+            }
+        }
+        
+        .ro-blue {
+            color: #0057b7;
+        }
+        
+        .ro-yellow {
+            color: #ffd700;
+        }
+        
+        .ro-red {
+            color: #d7141a;
+        }
+        
+        /* Video fallback message */
+        .video-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #172a45;
+            z-index: -3;
+            color: #b0c4de;
+            font-size: 1rem;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 500px) {
+            .container {
+                max-width: 95%;
+                left: 2.5%;
+                right: 2.5%;
+                top: 15px;
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .date-box {
+                min-width: calc(50% - 10px);
+            }
+            
+            .time {
+                font-size: 1.5rem;
+            }
+            
+            #verseText {
+                font-size: 0.9rem;
+            }
+            
+            #muteButton {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .date-box {
+                min-width: 100%;
+            }
+            
+            .time {
+                font-size: 1.3rem;
+            }
+        }
+        
+        .verse-progress {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #ffd700;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video autoplay muted loop playsinline id="bg-video" aria-label="Background video" role="presentation" preload="auto">
+            <!-- MP4 for most browsers -->
+            <source src="media/tg.mp4" type="video/mp4">
+            <!-- WebM for Firefox and other browsers -->
+            <source src="media/tg.webm" type="video/webm">
+            Browserul tău nu suportă video HTML5.
+        </video>
+        <div class="video-fallback" id="videoFallback">
+            <div>
+                <h3>Video-ul nu se poate încărca</h3>
+                <p>Browserul tău nu suportă formatul video sau nu are permisiunea de redare automată.</p>
+                <p>Site-ul funcționează normal, dar fundalul video nu este disponibil.</p>
+            </div>
+        </div>
+        <div class="video-overlay"></div>
+    </div>
+    
+    <button id="muteButton" aria-label="Toggle sound" role="button">
+        <span id="soundIcon" aria-hidden="true">🔇</span>
+        <span id="soundText">Sunet OFF</span>
+    </button>
+    
+    <div class="container">
+        <h1>Romanian Time</h1>
+        
+        <div class="date-container">
+            <div class="date-box">
+                <div class="date-label">Ziua</div>
+                <div class="date-value" id="currentDay">Se încarcă...</div>
+            </div>
+            <div class="date-box">
+                <div class="date-label">Data</div>
+                <div class="date-value" id="currentDate">Se încarcă...</div>
+            </div>
+            <div class="date-box">
+                <div class="date-label">Anotimp</div>
+                <div class="date-value" id="currentSeason">Se încarcă...</div>
+            </div>
+        </div>
+        
+        <div class="day-indicator" id="dayIndicator">
+            <div class="day-dot" data-day="0" role="presentation" aria-label="Duminică"></div>
+            <div class="day-dot" data-day="1" role="presentation" aria-label="Luni"></div>
+            <div class="day-dot" data-day="2" role="presentation" aria-label="Marți"></div>
+            <div class="day-dot" data-day="3" role="presentation" aria-label="Miercuri"></div>
+            <div class="day-dot" data-day="4" role="presentation" aria-label="Joi"></div>
+            <div class="day-dot" data-day="5" role="presentation" aria-label="Vineri"></div>
+            <div class="day-dot" data-day="6" role="presentation" aria-label="Sâmbătă"></div>
+        </div>
+        
+        <div class="time" id="currentTime">
+            <span id="hours" class="ro-blue">00</span>:
+            <span id="minutes" class="ro-yellow">00</span>:
+            <span id="seconds" class="ro-red seconds">00</span>
+        </div>
+        
+        <div class="verse-container">
+            <div class="verse-card" id="verseCard">
+                <p id="verseText">Se încarcă versetul...</p>
+                <p id="verseRef">- Referință -</p>
+            </div>
+            <div class="verse-progress">
+                <div class="progress-bar" id="verseProgress"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Ora curentă în fusul orar al României (UTC+2/UTC+3)
+        </div>
+    </div>
+    
+    <script>
+        const days = [
+            'Duminică', 'Luni', 'Marți', 'Miercuri',
+            'Joi', 'Vineri', 'Sâmbătă'
+        ];
+        
+        const seasons = {
+            'winter': 'Iarnă',
+            'spring': 'Primăvară',
+            'summer': 'Vară',
+            'autumn': 'Toamnă'
+        };
+        
+        let lastDay = null;
+        let currentVerseIndex = 0;
+        const verseInterval = 10000; // 10 seconds for demo (change to 3600000 for 1 hour)
+        let verseStartTime = Date.now();
+        let verseTimer = null;
+        
+        const bibleVerses = [
+            {
+                text: "Pentru că atât de mult a iubit Dumnezeu lumea, că a dat pe singurul Lui Fiu, pentru ca oricine crede în El să nu piară, ci să aibă viața veșnică.",
+                ref: "Ioan 3:16"
+            },
+            {
+                text: "Și cunoșteam că toate lucrează împreună spre binele celor ce iubesc pe Dumnezeu, celor ce sunt chemați după planul Lui.",
+                ref: "Romani 8:28"
+            },
+            {
+                text: "În toate împrejurările, mulțumiți! Căci aceasta este voia lui Dumnezeu în Hristos Iisus pentru voi.",
+                ref: "1 Tesaloniceni 5:18"
+            },
+            {
+                text: "Căci prin har sunteți mântuiți, prin credință. Și aceasta nu este din voi, ci este darul lui Dumnezeu.",
+                ref: "Efeseni 2:8"
+            },
+            {
+                text: "În nici o împrejurare nu vă îngrijiți, ci în toate rugăciunile și cererile, cu mulțumire, să faceți cunoscute cererile voastre lui Dumnezeu.",
+                ref: "Filipeni 4:6"
+            },
+            {
+                text: "Iisus i-a zis: «Eu sunt învierea și viața. Cine crede în Mine, de va muri, va trăi.",
+                ref: "Ioan 11:25"
+            },
+            {
+                text: "Dacă mărturisim păcatele noastre, El este credincios și drept, ca să ne ierte păcatele și să ne curățească de orice nedreptate.",
+                ref: "1 Ioan 1:9"
+            },
+            {
+                text: "Căci Dumnezeu nu ne-a dat duh de frică, ci de putere, de dragoste și de chibzuință.",
+                ref: "2 Timotei 1:7"
+            },
+            {
+                text: "Toate lucrurile le pot în Cel ce mă întărește.",
+                ref: "Filipeni 4:13"
+            },
+            {
+                text: "Încredințează-te cu toată inima ta Domnului și nu te bizui pe priceperea ta.",
+                ref: "Proverbe 3:5"
+            }
+        ];
+        
+        function pad(n) {
+            return n < 10 ? '0' + n : n;
+        }
+        
+        function updateDayIndicator(dayIndex) {
+            document.querySelectorAll('.day-dot').forEach(dot => {
+                dot.classList.toggle('active', Number(dot.dataset.day) === dayIndex);
+            });
+        }
+        
+        function getSeason(date) {
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            
+            if ((month === 12 && day >= 21) || month <= 2 || (month === 3 && day < 20)) {
+                return seasons.winter;
+            } else if ((month === 3 && day >= 20) || month === 4 || month === 5 || (month === 6 && day < 21)) {
+                return seasons.spring;
+            } else if ((month === 6 && day >= 21) || month === 7 || month === 8 || (month === 9 && day < 23)) {
+                return seasons.summer;
+            } else {
+                return seasons.autumn;
+            }
+        }
+        
+        function updateVerse() {
+            const verseCard = document.getElementById('verseCard');
+            verseCard.style.opacity = '0';
+            
+            setTimeout(() => {
+                const verse = bibleVerses[currentVerseIndex];
+                document.getElementById('verseText').textContent = verse.text;
+                document.getElementById('verseRef').textContent = verse.ref;
+                
+                verseCard.style.opacity = '1';
+                verseStartTime = Date.now();
+                
+                // Move to next verse (loop back to 0 when reaching end)
+                currentVerseIndex = (currentVerseIndex + 1) % bibleVerses.length;
+            }, 500);
+        }
+        
+        function updateVerseProgress() {
+            const elapsed = Date.now() - verseStartTime;
+            const progress = Math.min(100, (elapsed / verseInterval) * 100);
+            document.getElementById('verseProgress').style.width = progress + '%';
+        }
+        
+        function getRomanianTime() {
+            const now = new Date();
+            // Calculate Romanian time (UTC+2 or UTC+3)
+            const offset = now.getTimezoneOffset() * 60000; // local offset in ms
+            const utc = now.getTime() + offset;
+            
+            // Romania is in EET (UTC+2) or EEST (UTC+3)
+            // DST in Romania: Last Sunday March to Last Sunday October
+            const year = now.getUTCFullYear();
+            const march = new Date(Date.UTC(year, 2, 31, 0, 0, 0));
+            march.setDate(31 - march.getUTCDay());
+            const october = new Date(Date.UTC(year, 9, 31, 0, 0, 0));
+            october.setDate(31 - october.getUTCDay());
+            
+            const isDST = now >= march && now < october;
+            const roOffset = (isDST ? 3 : 2) * 3600000;
+            
+            return new Date(utc + roOffset);
+        }
+        
+        function updateTime() {
+            const roTime = getRomanianTime();
+            const dayIndex = roTime.getDay();
+            
+            // Update day only if changed
+            if (dayIndex !== lastDay) {
+                document.getElementById('currentDay').textContent = days[dayIndex];
+                updateDayIndicator(dayIndex);
+                lastDay = dayIndex;
+            }
+            
+            // Update date only if changed
+            const dateStr = [
+                pad(roTime.getDate()),
+                pad(roTime.getMonth() + 1),
+                roTime.getFullYear()
+            ].join('.');
+            
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl.textContent !== dateStr) {
+                dateEl.textContent = dateStr;
+            }
+            
+            // Update season
+            const seasonStr = getSeason(roTime);
+            const seasonEl = document.getElementById('currentSeason');
+            if (seasonEl.textContent !== seasonStr) {
+                seasonEl.textContent = seasonStr;
+            }
+            
+            // Update time
+            const hours = pad(roTime.getHours());
+            const minutes = pad(roTime.getMinutes());
+            const seconds = pad(roTime.getSeconds());
+            
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            
+            if (hoursEl.textContent !== hours) hoursEl.textContent = hours;
+            if (minutesEl.textContent !== minutes) minutesEl.textContent = minutes;
+            if (secondsEl.textContent !== seconds) secondsEl.textContent = seconds;
+            
+            // Update verse progress
+            updateVerseProgress();
+        }
+        
+        // Debounce for resize
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // Initialize and start verse rotation
+            updateVerse();
+            verseTimer = setInterval(updateVerse, verseInterval);
+            
+            // Set initial day indicator
+            const roTime = getRomanianTime();
+            updateDayIndicator(roTime.getDay());
+            
+            // Mute/unmute video
+            const video = document.getElementById('bg-video');
+            const muteButton = document.getElementById('muteButton');
+            const soundIcon = document.getElementById('soundIcon');
+            const soundText = document.getElementById('soundText');
+            const videoFallback = document.getElementById('videoFallback');
+            
+            // Hide fallback initially
+            videoFallback.style.display = 'none';
+            
+            // Set initial sound state
+            if (video.muted) {
+                soundIcon.textContent = '🔇';
+                soundText.textContent = 'Sunet OFF';
+            } else {
+                soundIcon.textContent = '🔊';
+                soundText.textContent = 'Sunet ON';
+            }
+            
+            // Check if video is playing
+            const isVideoPlaying = (video) => {
+                return video.currentTime > 0 && 
+                    !video.paused && 
+                    !video.ended && 
+                    video.readyState > 2;
+            };
+            
+            // Handle video playback issues
+            const handleVideoPlayback = () => {
+                if (!isVideoPlaying(video)) {
+                    // Try to play the video programmatically
+                    const playPromise = video.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Autoplay failed:', error);
+                            // Show fallback if video can't be played
+                            videoFallback.style.display = 'flex';
+                        });
+                    }
+                }
+            };
+            
+            // Check video playback after a delay
+            setTimeout(handleVideoPlayback, 1000);
+            
+            // Try to play video when user interacts with mute button
+            muteButton.addEventListener('click', () => {
+                video.muted = !video.muted;
+                if (video.muted) {
+                    soundIcon.textContent = '🔇';
+                    soundText.textContent = 'Sunet OFF';
+                } else {
+                    soundIcon.textContent = '🔊';
+                    soundText.textContent = 'Sunet ON';
+                }
+                
+                // Try to play video if it's not playing
+                if (!isVideoPlaying(video)) {
+                    video.play().catch(error => {
+                        console.log('Playback failed:', error);
+                    });
+                }
+            });
+        });
+        
+        // Disable context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
